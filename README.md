@@ -8,3 +8,5 @@ Aplikasi POS ini berjalan di dua lingkungan pengembangan, yakni versi web dan mo
 2. Filament 3.2 (TALL Stack)
 3. Flutter (mobile app)
 
+### Live Site
+Aplikasi web Sistemkasir dapat diakses melalui https://sistemkasir.mansalman.my.id
