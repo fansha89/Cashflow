@@ -4,7 +4,7 @@ Aplikasi POS adalah sebuah aplikasi yang dapat digunakan untuk mengelola transak
 Aplikasi POS ini berjalan di dua lingkungan pengembangan, yakni versi web dan mobile app.
 
 ### Fitur Utama
-1. Manajemen transaksi keuangan dari penjualan dan pembayaran, pendataan stok barang, disediakan grafik keuntungan/omset penjualan, dan dapat mendata barang dari barcode untuk langsung dimasukkan ke dalam keranjang pembelian
+1. Manajemen transaksi keuangan dari penjualan dan pembayaran, pendataan stok barang, disediakan grafik keuntungan/omset penjualan, dan dapat melakukan pemindaian barang dari barcode untuk langsung dimasukkan ke dalam keranjang pembelian
 2. Manajemen transaksi pendataan barang dan melakukan pemesanan/order melalui aplikasi mobile
 
 ### Tech Stack
