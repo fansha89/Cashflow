@@ -10,3 +10,7 @@ Aplikasi POS ini berjalan di dua lingkungan pengembangan, yakni versi web dan mo
 
 ### Live Site
 Aplikasi web Sistemkasir dapat diakses melalui https://sistemkasir.mansalman.my.id
+
+### Informasi Autentikasi Login
+username : admin@sistemkasir.com
+password : admin123
