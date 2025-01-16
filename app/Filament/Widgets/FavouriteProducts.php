@@ -25,7 +25,6 @@ class FavouriteProducts extends BaseWidget
                 Tables\Columns\TextColumn::make('name')
                 ->searchable(),
                 Tables\Columns\TextColumn::make('order_products_count')
-                ->searchable()
                 ->label('Total Ordered Product'),
             ])
             ->defaultPaginationPageOption(5);
