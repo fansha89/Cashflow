@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\PaymentMethodController;
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::apiResource('products', ProductController::class);
+Route::get('/download-template', [TemplateController::class, 'download'])->name('download-template');
 Route::get('/product/barcode/{barcode}', [ProductController::class, 'showByBarcode'])->middleware(['auth:sanctum']);
 Route::get('/payment-methods', [PaymentMethodController::class, 'index'])->middleware(['auth:sanctum']);
 Route::apiResource('/orders', OrderController::class)->middleware(['auth:sanctum']);

@@ -2,6 +2,6 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
-    outDir: 'dist' // Pastikan hasil build disimpan di dist
+    outDir: 'public/build', // Ubah ke 'public/build' agar sesuai dengan Laravel
   }
 });

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -19,42 +20,84 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        // Validasi input
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
-            'password' => 'required|string|min:6'
-        ]);
+        try {
+            // Validasi input tanpa menggunakan exists:users,email
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'password' => 'required|string|min:6'
+            ]);
 
-        if ($validator->fails()) {
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            // Cari user berdasarkan email
+            $user = User::where('email', $request->email)->first();
+
+            // Cek apakah user ada dan password sesuai
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Email or password is incorrect',
+                    'data' => null
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+
+            // Hapus token lama sebelum membuat yang baru (opsional)
+            $user->tokens()->delete();
+
+            // Buat token API baru
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Login successfully',
+                'data' => [
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email
+                    ]
+                ]
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Validation error',
-                'errors' => $validator->errors()
-            ], 422);
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
 
-        $user = User::where('email', $request->email)->first();
+    /**
+     * Handle user logout and revoke token.
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function logout(Request $request)
+    {
+        try {
+            if ($request->user()) {
+                $request->user()->tokens()->delete();
+            }
 
-        // Cek password
-        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Logout successfully'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email or password is incorrect',
-                'data' => null
-            ], 401);
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        // Buat token API
-        $token = $user->createToken('cashflow')->plainTextToken;
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Login successfully',
-            'data' => [
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user
-            ]
-        ], 200);
     }
 }

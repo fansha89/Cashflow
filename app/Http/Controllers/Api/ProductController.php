@@ -5,71 +5,156 @@ namespace App\Http\Controllers\Api;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the products.
      */
-    public function index(Request $request) // Tambahkan Request $request
+    public function index(): JsonResponse
     {
-        $products = Product::all();
+        $products = Product::select('id', 'name', 'price', 'barcode', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return response()->json([
             'success' => true,
             'message' => 'Success get products',
             'data' => $products
-        ]);
+        ], Response::HTTP_OK);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Download the product template.
      */
-    public function store(Request $request)
+    public function downloadTemplate()
     {
-        //
-    }
+        $filePath = storage_path('app/templates/template.xlsx');
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
-
-    public function showByBarcode($barcode)
-    {
-        $product = Product::where('barcode', $barcode)->first();
-
-        if(!$product)
-        {
+        if (!file_exists($filePath)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Product not found',
-                'data' => null
-            ]);
+                'message' => 'Template file not found',
+            ], Response::HTTP_NOT_FOUND);
         }
+
+        return response()->download($filePath, 'Product_Template.xlsx');
+    }
+
+    /**
+     * Store a newly created product.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'barcode' => 'nullable|string|unique:products,barcode',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $product = Product::create($validated);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully',
+                'data' => $product
+            ], Response::HTTP_CREATED);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Product creation failed: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Display the specified product.
+     */
+    public function show(string $id): JsonResponse
+    {
+        $product = Product::select('id', 'name', 'price', 'barcode', 'created_at')
+            ->findOrFail($id);
+
         return response()->json([
             'success' => true,
             'message' => 'Product found',
             'data' => $product
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Update the specified product.
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'price' => 'sometimes|numeric|min:0',
+            'barcode' => 'sometimes|string|unique:products,barcode,' . $id,
         ]);
+
+        DB::beginTransaction();
+        try {
+            $product->update($validated);
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product updated successfully',
+                'data' => $product
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Product update failed: ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * Remove the specified product.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product deleted successfully'
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Get product by barcode.
+     */
+    public function showByBarcode(string $barcode): JsonResponse
+    {
+        $product = Product::select('id', 'name', 'price', 'barcode', 'created_at')
+            ->firstWhere('barcode', $barcode);
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product not found',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product found',
+            'data' => $product
+        ], Response::HTTP_OK);
     }
 }
