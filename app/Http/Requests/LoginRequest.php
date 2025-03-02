@@ -24,12 +24,12 @@ class LoginRequest extends FormRequest
         return [
             /**
              * Email
-             * @example "admin@sistemkasir.com"
+             * @example "fansha1@gmail.com"
              */
             'email' => ['required', 'email'],
             /**
              * Password
-             * @example "admin123 "
+             * @example "fansha13"
              */
             'password' => ['required'],
         ];
