@@ -56,7 +56,7 @@ Aplikasi dapat diakses di `http://127.0.0.1:8000`
 | DELETE | /api/products/{id} | Menghapus produk |
 
 ## Kontributor
-- **Fansha Fakhriza** (fansha89)
+- **Mozza** (mozza89)
 
 ## Lisensi
 Proyek ini menggunakan lisensi **MIT**.
