@@ -10,10 +10,10 @@ Cashflow adalah aplikasi manajemen keuangan yang dirancang untuk membantu penggu
 - **RESTful API**: Menggunakan Laravel sebagai backend untuk komunikasi antar sistem.
 
 ## Teknologi yang Digunakan
-- **Framework**: Laravel 10
+- **Framework**: Laravel 11
 - **Database**: MySQL
 - **Autentikasi**: Laravel Breeze
-- **Cloud Hosting**: Microsoft Azure
+- **Cloud Hosting**: 
 
 ## Instalasi dan Konfigurasi
 ### 1. Clone Repository
