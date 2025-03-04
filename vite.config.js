@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
 
 export default defineConfig({
-  build: {
-    outDir: 'public/build', // Ubah ke 'public/build' agar sesuai dengan Laravel
-  }
+    plugins: [
+        laravel([
+            'resources/css/app.css',
+            'resources/js/app.js',
+        ]),
+    ],
 });
